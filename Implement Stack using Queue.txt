@@ -1,0 +1,76 @@
+#include <stdbool.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 200
+
+typedef struct {
+    int data[MAX_SIZE];
+    int front;
+    int rear;
+    int size;
+} Queue;
+
+void q_init(Queue* q) {
+    q->front = 0;
+    q->rear = 0;
+    q->size = 0;
+}
+
+void q_push(Queue* q, int val) {
+    q->data[q->rear] = val;
+    q->rear = (q->rear + 1) % MAX_SIZE;
+    q->size++;
+}
+
+int q_pop(Queue* q) {
+    int val = q->data[q->front];
+    q->front = (q->front + 1) % MAX_SIZE;
+    q->size--;
+    return val;
+}
+
+int q_front(Queue* q) {
+    return q->data[q->front];
+}
+
+bool q_empty(Queue* q) {
+    return q->size == 0;
+}
+
+typedef struct {
+    Queue q1;
+    Queue q2;
+} MyStack;
+
+MyStack* myStackCreate() {
+    MyStack* stack = (MyStack*)malloc(sizeof(MyStack));
+    q_init(&stack->q1);
+    q_init(&stack->q2);
+    return stack;
+}
+
+void myStackPush(MyStack* obj, int x) {
+    q_push(&obj->q2, x);
+    while (!q_empty(&obj->q1)) {
+        q_push(&obj->q2, q_pop(&obj->q1));
+    }
+    Queue temp = obj->q1;
+    obj->q1 = obj->q2;
+    obj->q2 = temp;
+}
+
+int myStackPop(MyStack* obj) {
+    return q_pop(&obj->q1);
+}
+
+int myStackTop(MyStack* obj) {
+    return q_front(&obj->q1);
+}
+
+bool myStackEmpty(MyStack* obj) {
+    return q_empty(&obj->q1);
+}
+
+void myStackFree(MyStack* obj) {
+    free(obj);
+}
