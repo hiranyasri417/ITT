@@ -1,0 +1,52 @@
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MAX_CALLS 30005
+
+typedef struct {
+    int value;
+    int min_val;
+} StackNode;
+
+typedef struct {
+    StackNode* data;
+    int top_idx;
+} MinStack;
+
+MinStack* minStackCreate() {
+    MinStack* stack = (MinStack*)malloc(sizeof(MinStack));
+    stack->data = (StackNode*)malloc(MAX_CALLS * sizeof(StackNode));
+    stack->top_idx = -1;
+    return stack;
+}
+
+void minStackPush(MinStack* obj, int val) {
+    obj->top_idx++;
+    obj->data[obj->top_idx].value = val;
+    
+    if (obj->top_idx == 0) {
+        obj->data[obj->top_idx].min_val = val;
+    } else {
+        int current_min = obj->data[obj->top_idx - 1].min_val;
+        obj->data[obj->top_idx].min_val = (val < current_min) ? val : current_min;
+    }
+}
+
+void minStackPop(MinStack* obj) {
+    if (obj->top_idx >= 0) {
+        obj->top_idx--;
+    }
+}
+
+int minStackTop(MinStack* obj) {
+    return obj->data[obj->top_idx].value;
+}
+
+int minStackGetMin(MinStack* obj) {
+    return obj->data[obj->top_idx].min_val;
+}
+
+void minStackFree(MinStack* obj) {
+    free(obj->data);
+    free(obj);
+}
