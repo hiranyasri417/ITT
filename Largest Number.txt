@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+int compare(const void *a, const void *b) {
+    char s1[40];
+    char s2[40];
+    sprintf(s1, "%d%d", *(const int *)b, *(const int *)a);
+    sprintf(s2, "%d%d", *(const int *)a, *(const int *)b);
+    return strcmp(s1, s2);
+}
+char *largestNumber(int *nums, int numsSize) {
+    qsort(nums, numsSize, sizeof(int), compare);   
+    if (nums[0] == 0) {
+        char *zero = (char *)malloc(2);
+        strcpy(zero, "0");
+        return zero;
+    }
+    char *result = (char *)malloc(numsSize * 12 + 1);
+    result[0] = '\0';
+    for (int i = 0; i < numsSize; i++) {
+        char temp[12];
+        sprintf(temp, "%d", nums[i]);
+        strcat(result, temp);
+    }
+    return result;
+}   
