@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    char original[101];
+    char sorted[101];
+    int index;
+} Word;
+
+int compareChars(const void* a, const void* b) {
+    return (*(char*)a - *(char*)b);
+}
+
+int compareWords(const void* a, const void* b) {
+    return strcmp(((Word*)a)->sorted, ((Word*)b)->sorted);
+}
+
+char*** groupAnagrams(char** strs, int strsSize, int* returnSize, int** returnColumnSizes) {
+    if (strsSize == 0) {
+        *returnSize = 0;
+        return NULL;
+    }
+
+    Word* words = (Word*)malloc(strsSize * sizeof(Word));
+    for (int i = 0; i < strsSize; i++) {
+        strcpy(words[i].original, strs[i]);
+        strcpy(words[i].sorted, strs[i]);
+        qsort(words[i].sorted, strlen(words[i].sorted), sizeof(char), compareChars);
+        words[i].index = i;
+    }
+
+    qsort(words, strsSize, sizeof(Word), compareWords);
+
+    char*** result = (char***)malloc(strsSize * sizeof(char**));
+    *returnColumnSizes = (int*)malloc(strsSize * sizeof(int));
+    int groupCount = 0;
+
+    int i = 0;
+    while (i < strsSize) {
+        int j = i;
+        while (j < strsSize && strcmp(words[i].sorted, words[j].sorted) == 0) {
+            j++;
+        }
+
+        int groupSize = j - i;
+        result[groupCount] = (char**)malloc(groupSize * sizeof(char*));
+        (*returnColumnSizes)[groupCount] = groupSize;
+
+        for (int k = 0; k < groupSize; k++) {
+            result[groupCount][k] = (char*)malloc((strlen(words[i + k].original) + 1) * sizeof(char));
+            strcpy(result[groupCount][k], words[i + k].original);
+        }
+
+        groupCount++;
+        i = j;
+    }
+
+    *returnSize = groupCount;
+    free(words);
+    return result;
+}
